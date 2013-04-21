@@ -1,7 +1,12 @@
+library RollerCoaster;
+
 import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
 import 'package:three/three.dart';
+
+part  'RollerCoaster.dart';
+
 
 class Canvas_Geometry_Cube
 {
