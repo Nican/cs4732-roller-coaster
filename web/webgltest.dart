@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
 import 'package:three/three.dart';
+import 'CartController.dart';
 
 part  'RollerCoaster.dart';
 
@@ -29,6 +30,7 @@ class Canvas_Geometry_Cube
   num windowHalfY;
   
   SplineCurve3 spline;
+  CartController cc;
 
   Canvas_Geometry_Cube()
   {
@@ -47,7 +49,7 @@ class Canvas_Geometry_Cube
                                new Vector3(-100,0,100),
                                new Vector3(0,0,0)
                                ]);
-    
+    cc = new CartController(spline, 160, .001);
     init();
     animate(0.0);
     
@@ -192,15 +194,19 @@ class Canvas_Geometry_Cube
     window.requestAnimationFrame(animate);
   }
   
-  num totalTime = 0;
-
+  num lastTime = 0;
   void render(t)
   {
+<<<<<<< HEAD
     totalTime += t;
     cube.position = spline.getPoint( (t / 3000) % 1 );
     cube.position.y += 50;
+=======
+    cube.position = cc.getNextPoint(t-lastTime);
+>>>>>>> 9fdb912766061e3ff0d5e6819013fc90d5f0a786
     
     renderer.render( scene, camera );
+    lastTime = t;
   }
 }
 
