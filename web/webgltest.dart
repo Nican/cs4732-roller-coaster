@@ -22,6 +22,8 @@ class Canvas_Geometry_Cube
 
   num windowHalfX;
   num windowHalfY;
+  
+  SplineCurve3 spline;
 
   Canvas_Geometry_Cube()
   {
@@ -30,8 +32,21 @@ class Canvas_Geometry_Cube
 
   void run()
   {
+    spline = new SplineCurve3([
+                               new Vector3(0,0,0),
+                               new Vector3(100,0,0),
+                               new Vector3(200,100,0),
+                               new Vector3(300,100,10),
+                               new Vector3(200,100,200),
+                               new Vector3(0,0,200),
+                               new Vector3(-100,0,100),
+                               new Vector3(0,0,0)
+                               ]);
+    
     init();
-    animate();
+    animate(0.0);
+    
+    
   }
 
   void init()
@@ -60,9 +75,9 @@ class Canvas_Geometry_Cube
 
     scene = new Scene();
 
-    camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
     camera.position.y = 150;
-    camera.position.z = 500;
+    camera.position.z = 2000;
     scene.add( camera );
 
     // Cube
@@ -84,7 +99,7 @@ class Canvas_Geometry_Cube
     plane = new Mesh( new PlaneGeometry( 200, 200 ), new MeshBasicMaterial( color: 0xe0e0e0, overdraw: true ) );
     plane.rotation.x = - 90 * ( Math.PI / 180 );
     //plane.overdraw = true; //TODO where is this prop?
-    scene.add( plane );
+    //scene.add( plane );
 
     renderer = new CanvasRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -97,7 +112,8 @@ class Canvas_Geometry_Cube
     document.onTouchStart.listen(onDocumentTouchStart);
     document.onTouchMove.listen(onDocumentTouchMove);
   
-    new Timer.periodic(new Duration(milliseconds:10), (Timer timer) => animate());
+    //new Timer.periodic(new Duration(milliseconds:10), (Timer timer) => animate());
+    
   }
 
   void onDocumentMouseDown( event )
@@ -161,18 +177,24 @@ class Canvas_Geometry_Cube
   }
 
 
-  void animate()
+  void animate(num highResTime)
   {
 //    window.webkitRequestAnimationFrame(animate);
 //    print('win dynamic ${window.dynamic['requestAnimationFrame']}');
 //    if ( window.dynamic['requestAnimationFrame'] != null )
 //      window.dynamic['requestAnimationFrame']( animate );
 
-    render();
+    render(highResTime);
+    window.requestAnimationFrame(animate);
   }
+  
+  num totalTime = 0;
 
-  void render()
+  void render(t)
   {
+    totalTime += t;
+    cube.position = spline.getPoint( (t / 3000) % 1 );
+    
     plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
     renderer.render( scene, camera );
   }
