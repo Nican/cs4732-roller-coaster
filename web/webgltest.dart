@@ -197,14 +197,9 @@ class Canvas_Geometry_Cube
   num lastTime = 0;
   void render(t)
   {
-<<<<<<< HEAD
-    totalTime += t;
     cube.position = spline.getPoint( (t / 3000) % 1 );
     cube.position.y += 50;
-=======
-    cube.position = cc.getNextPoint(t-lastTime);
->>>>>>> 9fdb912766061e3ff0d5e6819013fc90d5f0a786
-    
+
     renderer.render( scene, camera );
     lastTime = t;
   }
