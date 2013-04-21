@@ -2,17 +2,35 @@ part of RollerCoaster;
 
 class RollerCoaster extends Geometry {
   
+  int segmentsRadius = 4;
+  
   RollerCoaster( SplineCurve3 curve ) : super() {
     
     num delta = 0.01;
     
     for(num t = 0; t <= 1.0; t += delta ){
-      addSegment( curve.getPoint(t), curve.getPoint(t+delta), curve.getPoint((t+delta*2)%1) );
+      Vector3 position = curve.getPoint(t);
+      Vector3 next = curve.getPoint(t += delta );
+      Vector3 normal = new Vector3().sub(next, position).normalize();
+      
+      addRing( position, normal );
+      
+      //addSegment( curve.getPoint(t), curve.getPoint(t+delta), curve.getPoint((t+delta*2)%1) );
     }
     
     
     computeCentroids();
     mergeVertices();
+  }
+  
+  void addRing( Vector3 position, Vector3 normal )
+  {
+    Vector3 cross = new Vector3().cross( normal, new Vector3(0,1,0) ).normalize().multiplyScalar(10);
+    
+    vertices.add( new Vector3().add(position, cross) );
+    vertices.add( new Vector3().sub(position, cross) );
+    vertices.add( new Vector3().add(position, new Vector3(0,1,0)) );
+    vertices.add( new Vector3().add(position, new Vector3(0,-1,0)) );    
   }
   
   void addSegment( Vector3 position, Vector3 next, Vector3 next2 )

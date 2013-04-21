@@ -82,7 +82,7 @@ class Canvas_Geometry_Cube
 
     camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
     camera.position.y = 150;
-    camera.position.z = 2000;
+    camera.position.z = 500;
     scene.add( camera );
 
     // Cube
@@ -94,10 +94,14 @@ class Canvas_Geometry_Cube
       materials.add( new MeshBasicMaterial( color: rnd.nextDouble() * 0xffffff ) );
     }
 
-    cube = new Mesh( new CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new MeshFaceMaterial());// { 'overdraw' : true }) );
+    cube = new Mesh( new CubeGeometry( 50, 50, 50, 1, 1, 1, materials ), new MeshFaceMaterial());// { 'overdraw' : true }) );
     cube.position.y = 150;
     //cube.overdraw = true; //TODO where is this prop?
     scene.add( cube );
+    
+    var coaster = new Mesh( new RollerCoaster( spline ), new MeshBasicMaterial( color: 0xe0e0e0, overdraw: true )  );
+    scene.add(coaster);
+    
 
     // Plane
 
@@ -131,8 +135,6 @@ class Canvas_Geometry_Cube
 
     mouseXOnMouseDown = event.clientX - windowHalfX;
     targetRotationOnMouseDown = targetRotation;
-
-    print('onMouseDown mouseX = $mouseXOnMouseDown targRot = $targetRotationOnMouseDown');
   }
 
   void onDocumentMouseMove( event )
@@ -140,13 +142,10 @@ class Canvas_Geometry_Cube
     mouseX = event.clientX - windowHalfX;
 
     targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
-
-    print('onMouseMove mouseX = $mouseX targRot = $targetRotation');
   }
 
   void onDocumentMouseUp( event )
   {
-    print('onDocumentMouseUp');
     //document.onMouseMove.remove(onDocumentMouseMove);
     //document.onMouseUp.remove(onDocumentMouseUp);
     //document.onMouseOut.remove(onDocumentMouseOut);
@@ -199,8 +198,8 @@ class Canvas_Geometry_Cube
   {
     totalTime += t;
     cube.position = spline.getPoint( (t / 3000) % 1 );
+    cube.position.y += 50;
     
-    plane.rotation.z = cube.rotation.y += ( targetRotation - cube.rotation.y ) * 0.05;
     renderer.render( scene, camera );
   }
 }
