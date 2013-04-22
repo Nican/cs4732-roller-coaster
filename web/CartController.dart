@@ -25,14 +25,12 @@ class CartController{
   
   Vector3 getNextPoint(num t_delta){
     num velocity = Math.sqrt(Math.max(2*g*(maxHeight-curHeight),0));
-    print(velocity);
     if(velocity == 0){
       forward = !forward;
       if(getPoint(traveledDist - lastVelocity).y != curHeight){
         velocity = lastVelocity;
       }
     }
-    print("\t"+velocity.toString());
     num distance = velocity * (t_delta);
     
     
