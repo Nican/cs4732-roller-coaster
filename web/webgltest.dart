@@ -4,8 +4,7 @@ import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
 import 'package:three/three.dart';
-import 'CartController.dart';
-
+part 'CartController.dart';
 part  'RollerCoaster.dart';
 
 

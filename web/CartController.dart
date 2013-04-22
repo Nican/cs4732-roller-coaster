@@ -1,5 +1,4 @@
-import 'package:three/three.dart';
-import 'dart:math' as Math;
+part of RollerCoaster;
 
 class CartController{
   Curve3D curve;
