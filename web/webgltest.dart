@@ -48,7 +48,7 @@ class Canvas_Geometry_Cube
                                new Vector3(-100,0,100),
                                new Vector3(0,0,0)
                                ]);
-    cc = new CartController(spline, 160, .001);
+    cc = new CartController(spline, .16, .001);
     init();
     animate(0.0);
     
@@ -196,7 +196,7 @@ class Canvas_Geometry_Cube
   num lastTime = 0;
   void render(t)
   {
-    cube.position = spline.getPoint( (t / 3000) % 1 );
+    cube.position = cc.getNextPoint(t-lastTime);
     cube.position.y += 50;
 
     renderer.render( scene, camera );
