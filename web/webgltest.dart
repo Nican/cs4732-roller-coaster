@@ -4,30 +4,23 @@ import 'dart:html';
 import 'dart:math' as Math;
 import 'dart:async';
 import 'package:three/three.dart';
+import 'package:three/extras/core/curve_utils.dart' as CurveUtils;
 part 'CartController.dart';
-part  'RollerCoaster.dart';
-
+part 'RollerCoaster.dart';
+part 'CoasterSpline.dart';
 
 class Canvas_Geometry_Cube
 {
-  Element container;
-
   PerspectiveCamera camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
   Scene scene = new Scene();
   CanvasRenderer renderer;
 
   Mesh cube;
 
-  num targetRotation;
-  num targetRotationOnMouseDown;
-
-  num mouseX;
-  num mouseXOnMouseDown;
-
   num windowHalfX;
   num windowHalfY;
   
-  SplineCurve3 spline;
+  CoasterSpline spline;
   CartController cc;
 
   Canvas_Geometry_Cube()
@@ -37,16 +30,18 @@ class Canvas_Geometry_Cube
 
   void run()
   {
-    spline = new SplineCurve3([
-                               new Vector3(0,0,0),
-                               new Vector3(100,0,0),
-                               new Vector3(200,100,0),
-                               new Vector3(300,100,10),
-                               new Vector3(200,100,200),
-                               new Vector3(0,0,200),
-                               new Vector3(-100,0,100),
-                               new Vector3(0,0,0)
-                               ]);
+    spline = new CoasterSpline();
+    spline.addPoint(new Vector3(0,0,0), rotation: -Math.PI / 2);
+    spline.addPoint(new Vector3(100,0,0));
+    spline.addPoint(new Vector3(200,100,0));
+    spline.addPoint(new Vector3(300,100,10));
+    spline.addPoint(new Vector3(200,100,200));
+    spline.addPoint(new Vector3(0,0,200));
+    spline.addPoint(new Vector3(-300,0,200));
+    spline.addPoint(new Vector3(-400,0,100));
+    spline.addPoint(new Vector3(-300,0,000));
+    spline.addPoint(new Vector3(-100,0,000));
+    
     cc = new CartController(spline, .16, .001);
     init();
     animate(0.0);
@@ -56,16 +51,10 @@ class Canvas_Geometry_Cube
 
   void init()
   {
-    targetRotation = 0;
-    targetRotationOnMouseDown = 0;
-
-    mouseX = 0;
-    mouseXOnMouseDown = 0;
-
     windowHalfX = window.innerWidth / 2;
     windowHalfY = window.innerHeight / 2;
 
-    container = new Element.tag('div');
+    Element container = new Element.tag('div');
     document.body.nodes.add( container );
 
     camera.position.y = 150;
