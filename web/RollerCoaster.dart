@@ -24,7 +24,7 @@ class RollerCoaster extends Geometry {
       Quaternion quaternion = curve.getQuaternion(t, offset);
       Vector3 ringOffset = quaternion.multiplyVector3(curve.getUp(t)).multiplyScalar(5);
       
-      int newRing = addRing( position.clone().addSelf(ringOffset), quaternion );
+      int newRing = addRing( position.clone().addSelf(ringOffset), quaternion ); //.clone().addSelf(ringOffset)
       
       if( firstRing == null )
         firstRing = newRing;
@@ -51,21 +51,6 @@ class RollerCoaster extends Geometry {
     
     return index;
   }
-  
-  /*
-  int addRing( Vector3 position, Vector3 normal )
-  {
-    Vector3 cross = new Vector3().cross( normal, new Vector3(0,1,0) ).normalize().multiplyScalar(radius);
-    int index = vertices.length;
-    
-    vertices.add( position.clone().addSelf(new Vector3(0,radius,0)) );
-    vertices.add( position.clone().addSelf(cross) );
-    vertices.add( position.clone().subSelf(new Vector3(0,radius,0)) );    
-    vertices.add( position.clone().subSelf(cross) );
-    
-    return index;
-  }
-  */
   
   void createCylinderFaces( int lastIndex, int newIndex ){
     
