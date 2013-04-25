@@ -173,7 +173,8 @@ class Canvas_Geometry_Cube
     camera.lookAt( scene.position );
     
     num delta = Math.min(t-lastTime, 100.0);
-    cube.position = cc.getNextPoint(delta);
+    cc.update(delta);
+    cube.position = cc.getCurPoint();
     num progress = (cc.traveledDist/cc.totalDist)%1;
     
         
