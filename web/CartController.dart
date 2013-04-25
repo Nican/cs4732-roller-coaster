@@ -1,7 +1,7 @@
 part of RollerCoaster;
 
 class CartController{
-  Curve3D curve;
+  CoasterSpline curve;
   num totalDist;
   num traveledDist;
   num Energy;
@@ -12,6 +12,7 @@ class CartController{
   num lastSpeed;
   Vector3 lastDirection;
   num cur_t;
+  Vector3 forces;
   
   CartController(this.curve, [this.Energy = 20, this.g = 0.1, this.drag =0.0001]){
     totalDist = curve.getLengths().last;
@@ -19,8 +20,9 @@ class CartController{
     curHeight = curve.getPoint(0).y;
     forward = true;
     lastSpeed = calcSpeed();
-    lastDirection = getPoint(.001).clone().subSelf(getPoint(0)).normalize();
+    lastDirection = curve.getPoint(0).clone().subSelf(curve.getPoint(.99)).normalize();
     cur_t = 0;
+    forces = new Vector3();
   }
   
   Vector3 getPoint(num distance){
@@ -32,6 +34,7 @@ class CartController{
   }
   
   void update(num t_delta){
+    if(t_delta == 0) return;
     //handle switching direction on hills
     num speed = calcSpeed();
     if(speed == 0 && getPoint(traveledDist - lastSpeed).y != curHeight){ //we've stopped and are on a hill
@@ -55,17 +58,21 @@ class CartController{
     
     //Force Calculations
     Vector3 direction = (next.clone().subSelf(lastPoint)).normalize();
-    Vector3 acceleration = direction.clone().multiplyScalar(speed).subSelf(lastDirection.clone().multiplyScalar(lastSpeed)).divideScalar(t_delta);    
+    Vector3 acceleration = direction.clone().multiplyScalar(speed).subSelf(lastDirection.clone().multiplyScalar(lastSpeed)).divideScalar(t_delta);
     acceleration.y += g;
     
-    Vector3 normal = getNormal(traveledDist);
+    Vector3 normal = getCurNormal();
     num gForce = acceleration.dot(normal)/g;
     
     Vector3 lateral = new Vector3().cross(normal, direction);
     num lateralForce = lateral.dot(acceleration)/g;
     
-    num fowardForce = direction.dot(acceleration)/g;
-      
+    num forwardForce = direction.dot(acceleration)/g;
+    
+    forces.x = forwardForce;
+    forces.y = gForce;
+    forces.z = lateralForce;
+    
     //set state
     curHeight = next.y;    
     lastDirection = direction;
@@ -77,10 +84,8 @@ class CartController{
     return curve.getPoint(cur_t);
   }
   
-  Vector3 getNormal(num distance){
-    //for now, assume up
-    //TODO make this return the actual normal
-    return new Vector3(0,1,0);
+  Vector3 getCurNormal(){
+    return curve.getQuaternion(cur_t).multiplyVector3(new Vector3(0,1,0));
   }
   
   num get maxHeight => Energy/g;
