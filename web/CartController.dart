@@ -22,6 +22,7 @@ class CartController{
     lastSpeed = calcSpeed();
     lastDirection = curve.getPoint(0).clone().subSelf(curve.getPoint(.99)).normalize();
     cur_t = 0;
+    forces = new Vector3();
   }
   
   Vector3 getPoint(num distance){
