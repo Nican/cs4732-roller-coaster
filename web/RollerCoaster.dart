@@ -2,8 +2,8 @@ part of RollerCoaster;
 
 class RollerCoaster extends Geometry {
   
-  int segmentsRadius = 4;
-  num delta = 0.005;
+  int segmentsRadius = 8;
+  num delta = 0.01;
   num radius = 2.0;
   CoasterSpline curve;
   
@@ -13,6 +13,7 @@ class RollerCoaster extends Geometry {
     
     computeCentroids();
     computeFaceNormals();
+    computeVertexNormals();
     mergeVertices();
   }
   
@@ -40,7 +41,7 @@ class RollerCoaster extends Geometry {
       lastRing = newRing;
     }
     
-    createCylinderFaces( firstRing, lastRing  );
+    createCylinderFaces( lastRing, firstRing );
   }
   
   int addRing( Vector3 position, Quaternion quaternion )
@@ -48,10 +49,15 @@ class RollerCoaster extends Geometry {
     Vector3 cross = quaternion.multiplyVector3(new Vector3(0,radius,0));
     int index = vertices.length;
     
-    vertices.add( position.clone().addSelf(new Vector3(0,radius,0)) );
-    vertices.add( position.clone().addSelf(cross) );
-    vertices.add( position.clone().subSelf(new Vector3(0,radius,0)) );    
-    vertices.add( position.clone().subSelf(cross) );
+    for( int i = 0; i < segmentsRadius; i++ )
+    {
+      num a = i / segmentsRadius * Math.PI * 2;
+      num c = Math.cos(a);
+      num s = Math.sin(a);
+      Vector3 vec = new Vector3(c * radius, s * radius, 0);
+      
+      vertices.add( position.clone().addSelf( quaternion.multiplyVector3(vec) ) );
+    }
     
     return index;
   }
@@ -65,14 +71,14 @@ class RollerCoaster extends Geometry {
       var c = newIndex + i + 1;
       var d = newIndex + i;
  
-      if( b == lastIndex + 4 )
+      if( b == lastIndex + segmentsRadius )
         b = lastIndex;
       
       
-      if( c == newIndex + 4 )
+      if( c == newIndex + segmentsRadius )
         c = newIndex;
       
-      faces.add( new Face4( d, c, b, a ) );
+      faces.add( new Face4( a, b, c, d ) );
       
       List faceVertexUV = faceVertexUvs[ 0 ];
       faceVertexUV.add( [

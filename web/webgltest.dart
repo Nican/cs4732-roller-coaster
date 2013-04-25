@@ -11,9 +11,9 @@ part 'CoasterSpline.dart';
 
 class Canvas_Geometry_Cube
 {
-  PerspectiveCamera camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+  PerspectiveCamera camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.01, 100000 );
   Scene scene = new Scene();
-  CanvasRenderer renderer;
+  WebGLRenderer renderer;
 
   Mesh cube;
   Mesh direction;
@@ -61,7 +61,7 @@ class Canvas_Geometry_Cube
     spline.addPoint(new Vector3(-300,0,000));
     spline.addPoint(new Vector3(-100,0,000));
     */
-    spline.addPoint(new Vector3(0,0,0), rotation: 0);
+    spline.addPoint(new Vector3(0,0,0), rotation: Math.PI);
     spline.addPoint(new Vector3(0,0,300));
     spline.addPoint(new Vector3(150,50,300));
     spline.addPoint(new Vector3(300,100,300));
@@ -104,13 +104,15 @@ class Canvas_Geometry_Cube
     //cube.overdraw = true; //TODO where is this prop?
     scene.add( cube );
     
-    var coaster = new Mesh( new RollerCoaster( spline ), new MeshBasicMaterial( color: 0xe0e0e0, overdraw: true )  );
+    MeshNormalMaterial mat = new MeshNormalMaterial( shading: SmoothShading );
+    
+    var coaster = new Mesh( new RollerCoaster( spline ), mat  );
     scene.add(coaster);
     
     spline.points.forEach((CoasterSplineItem point){
-      Mesh sphere = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0xff0000, overdraw: true )  );
-      sphere.position = point.position;
-      scene.add(sphere);
+      //Mesh sphere = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0xff0000, overdraw: true )  );
+     // sphere.position = point.position;
+      //scene.add(sphere);
     });
     
     Geometry geometry = new Geometry();
@@ -118,11 +120,16 @@ class Canvas_Geometry_Cube
     var line = new Line(geometry, new LineBasicMaterial(color: 0xff0000));
     scene.add(line);
     
-    direction = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0x0000ff, overdraw: true )  );
-    scene.add(direction);
+    Mesh floor = new Mesh( new PlaneGeometry(5000, 5000, 5, 5), new MeshNormalMaterial( shading: SmoothShading )  );
+    floor.position.y -= 50;
+    floor.rotation.x += -Math.PI / 2;
+    scene.add(floor);
+    
+    //direction = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0x0000ff, overdraw: true )  );
+    //scene.add(direction);
 
     // Renderer
-    renderer = new CanvasRenderer();
+    renderer = new WebGLRenderer( clearColorHex: 0xffffff );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
      container.nodes.add( renderer.domElement );
@@ -144,21 +151,20 @@ class Canvas_Geometry_Cube
   {
     camera.position.x += ( mouseX - camera.position.x ) * .1;
     camera.position.y += ( - mouseY - camera.position.y ) * .1;
-
     camera.lookAt( scene.position );
     
     num delta = Math.min(t-lastTime, 100.0);
-
+    
     cc.update(delta);
     cube.position = cc.getCurPoint();
-    num progress = cc.cur_t;
     
-        
-    Quaternion quaternion = spline.getQuaternion(progress);    
-    Quaternion quaternion2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), spline.getForward(progress) );
+    Vector3 forward = spline.getForward(cc.cur_t);        
+    Quaternion quaternion = spline.getQuaternion(cc.cur_t);    
+    Quaternion quaternion2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
+    quaternion.multiplySelf( quaternion2 );
     
-    cube.rotation.setEulerFromQuaternion(quaternion2);
-    cube.position.addSelf( quaternion2.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(10) );
+    cube.rotation.setEulerFromQuaternion(quaternion);
+    cube.position.addSelf( quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(18) );
     
     camera.position = cube.position;
     camera.rotation = cube.rotation;
