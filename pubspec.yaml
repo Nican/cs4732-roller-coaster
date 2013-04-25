@@ -4,5 +4,5 @@ dependencies:
   browser: any
   three: 
     git:
-      url: git://github.com/threeDart/three.dart.git
+      url: git://github.com/Nican/three.dart.git
       ref: latest
