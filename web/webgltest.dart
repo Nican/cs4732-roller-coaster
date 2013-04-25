@@ -9,6 +9,7 @@ part 'CartController.dart';
 part 'RollerCoaster.dart';
 part 'CoasterSpline.dart';
 
+//https://bitbucket.org/sinbad/ogre/src/9db75e3ba05c/OgreMain/include/OgreVector3.h#cl-651
 Quaternion quarternionFromVecs( Vector3 v1, Vector3 v2 ){
   v1 = v1.clone().normalize();
   v2 = v2.clone().normalize();
@@ -17,19 +18,31 @@ Quaternion quarternionFromVecs( Vector3 v1, Vector3 v2 ){
   if( dot >= 1.0 )
     return new Quaternion();
   
-  //if((dot-1).abs() < 0.001 )
-  //  return new Quaternion(0, 1, 0, 0);
   Quaternion q = new Quaternion();
-  num s = Math.sqrt ((1+dot) * 2);
-  num invs = 1 / s;
-  Vector3 c = v1.clone().crossSelf(v2);
   
-  q.x = c.x * invs;
-  q.y = c.y * invs;
-  q.z = c.z * invs;
-  q.w = s * 0.5;
+  if( dot < (1e-6 - 1.0) ){
+    Vector3 axis = new Vector3(1,0,0).crossSelf(v1);
+    
+    if( axis.isZero() ){
+      axis.setValues(0, 1, 0);
+      axis.crossSelf(v1);
+    }
+    axis.normalize();
+    
+    q.setFromAxisAngle(axis, Math.PI);    
+  } else {
   
-  q.normalize();
+    num s = Math.sqrt ((1+dot) * 2);
+    num invs = 1 / s;
+    Vector3 c = v1.clone().crossSelf(v2);
+    
+    q.x = c.x * invs;
+    q.y = c.y * invs;
+    q.z = c.z * invs;
+    q.w = s * 0.5;
+    
+    q.normalize();
+  }
   
   return q;
 }
