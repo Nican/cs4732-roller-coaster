@@ -5,21 +5,20 @@ import 'dart:math' as Math;
 import 'dart:async';
 import 'package:three/three.dart';
 import 'package:three/extras/core/curve_utils.dart' as CurveUtils;
+import 'package:three/extras/controls/firstpersoncontrols.dart';
 part 'CartController.dart';
 part 'RollerCoaster.dart';
 part 'CoasterSpline.dart';
+part 'CoasterEditor.dart';
 
 class Canvas_Geometry_Cube
 {
   PerspectiveCamera camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.01, 100000 );
+  FirstPersonControls controls;
   Scene scene = new Scene();
   WebGLRenderer renderer;
 
   Mesh cube;
-  Mesh direction;
-
-  num windowHalfX;
-  num windowHalfY;
   
   CoasterSpline spline = new CoasterSpline();
   CartController cc;
@@ -28,39 +27,11 @@ class Canvas_Geometry_Cube
 
   Canvas_Geometry_Cube()
   {
-
+    
   }
 
   void run()
   {
-    /*
-    spline.addPoint(new Vector3(-400,0,0));
-    spline.addPoint(new Vector3(-300,0,0));
-    spline.addPoint(new Vector3(300,100,0));
-    spline.addPoint(new Vector3(400,100,0));
-    
-    spline.addPoint(new Vector3(450,100, 50));
-    
-    spline.addPoint(new Vector3(400,100,100));
-    spline.addPoint(new Vector3(300,100,100));
-    spline.addPoint(new Vector3(-300,0,100));
-    spline.addPoint(new Vector3(-400,0,100));
-    
-    spline.addPoint(new Vector3(-450,0, 50));
-    */
-  
-    /*
-    spline.addPoint(new Vector3(0,0,0), rotation: 0);
-    spline.addPoint(new Vector3(100,0,0));
-    spline.addPoint(new Vector3(200,100,0));
-    spline.addPoint(new Vector3(300,100,100));
-    spline.addPoint(new Vector3(200,100,200));
-    spline.addPoint(new Vector3(0,0,200));
-    spline.addPoint(new Vector3(-300,0,200));
-    spline.addPoint(new Vector3(-400,0,100));
-    spline.addPoint(new Vector3(-300,0,000));
-    spline.addPoint(new Vector3(-100,0,000));
-    */
     spline.addPoint(new Vector3(0,0,0), rotation: Math.PI);
     spline.addPoint(new Vector3(0,0,300));
     spline.addPoint(new Vector3(150,50,300));
@@ -71,15 +42,12 @@ class Canvas_Geometry_Cube
     cc = new CartController(spline, .16, .001);
     
     init();
-    animate(0.0);
-    
-    
+    window.requestAnimationFrame(animate);
   }
 
   void init()
   {
-    windowHalfX = window.innerWidth / 2;
-    windowHalfY = window.innerHeight / 2;
+    controls = new FirstPersonControls (this.camera, document.body);
 
     Element container = new Element.tag('div');
     document.body.nodes.add( container );
@@ -92,19 +60,10 @@ class Canvas_Geometry_Cube
 
     // Cube
 
-    List materials = [];
-
-    var rnd = new Math.Random();
-    for ( int i = 0; i < 6; i ++ ) {
-      materials.add( new MeshBasicMaterial( color: rnd.nextDouble() * 0xffffff ) );
-    }
-
-    cube = new Mesh( new CubeGeometry( 20, 20, 20, 1, 1, 1, materials ), new MeshFaceMaterial());// { 'overdraw' : true }) );
-    cube.position.y = 150;
-    //cube.overdraw = true; //TODO where is this prop?
-    scene.add( cube );
-    
     MeshNormalMaterial mat = new MeshNormalMaterial( shading: SmoothShading );
+    
+    cube = new Mesh( new CubeGeometry( 20, 20, 20, 1, 1, 1 ), mat );
+    scene.add( cube );
     
     var coaster = new Mesh( new RollerCoaster( spline ), mat  );
     scene.add(coaster);
@@ -124,15 +83,12 @@ class Canvas_Geometry_Cube
     floor.position.y -= 50;
     floor.rotation.x += -Math.PI / 2;
     scene.add(floor);
-    
-    //direction = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0x0000ff, overdraw: true )  );
-    //scene.add(direction);
 
     // Renderer
     renderer = new WebGLRenderer( clearColorHex: 0xffffff );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-     container.nodes.add( renderer.domElement );
+    container.nodes.add( renderer.domElement );
   }
   
   onDocumentMouseMove(MouseEvent event) {
@@ -148,11 +104,7 @@ class Canvas_Geometry_Cube
   
   num lastTime = 0;
   void render(num t)
-  {
-    camera.position.x += ( mouseX - camera.position.x ) * .1;
-    camera.position.y += ( - mouseY - camera.position.y ) * .1;
-    camera.lookAt( scene.position );
-    
+  {    
     num delta = Math.min(t-lastTime, 100.0);
     
     cc.update(delta);
@@ -166,8 +118,9 @@ class Canvas_Geometry_Cube
     cube.rotation.setEulerFromQuaternion(quaternion);
     cube.position.addSelf( quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(18) );
     
-    camera.position = cube.position;
-    camera.rotation = cube.rotation;
+    //camera.position = cube.position;
+    //camera.rotation = cube.rotation;
+    controls.update(delta / 4);
     
     renderer.render( scene, camera );
     lastTime = t;
