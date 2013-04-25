@@ -186,7 +186,13 @@ class Canvas_Geometry_Cube
     camera.lookAt( scene.position );
     
     num delta = Math.min(t-lastTime, 100.0);
+<<<<<<< HEAD
+    cc.update(delta);
+    cube.position = cc.getCurPoint();
+    num progress = (cc.traveledDist/cc.totalDist)%1;
+=======
     cube.position = cc.getNextPoint(delta);
+>>>>>>> ad0bd0d6d8c68b5b89049c04de24ef769fe0f699
     
     num progress = spline.getUtoTmapping((cc.traveledDist/cc.totalDist)%1);
     
