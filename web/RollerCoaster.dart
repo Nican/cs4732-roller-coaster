@@ -12,6 +12,7 @@ class RollerCoaster extends Geometry {
     createRail( Math.PI / -2 );
     
     computeCentroids();
+    computeFaceNormals();
     mergeVertices();
   }
   
@@ -21,13 +22,13 @@ class RollerCoaster extends Geometry {
     
     for(num t = 0; t <= 1.0; t += delta ){
       Vector3 position = curve.getPoint(t);
-      //Quaternion quaternion = curve.getQuaternion(t, offset);
-      Quaternion quaternion2 = quarternionFromVecs(new Vector3(0,0,1), curve.getForward(t) );
-      quaternion2.multiplySelf( curve.getQuaternion(t, offset) );
+      Quaternion quaternion = curve.getQuaternion(t, offset);
+      Quaternion quaternion2 = new Quaternion().rotationBetween(new Vector3(0,0,1), curve.getForward(t) );
+      quaternion.multiplySelf( quaternion2 );
       
-      Vector3 ringOffset = quaternion2.multiplyVector3(curve.getUp(t)).multiplyScalar(5);
+      Vector3 ringOffset = quaternion.multiplyVector3(curve.getUp(t)).multiplyScalar(5);
       
-      int newRing = addRing( position.clone().addSelf(ringOffset), quaternion2 ); //.clone().addSelf(ringOffset)
+      int newRing = addRing( position.clone().addSelf(ringOffset), quaternion ); //.clone().addSelf(ringOffset)
       
       if( firstRing == null )
         firstRing = newRing;
@@ -71,7 +72,7 @@ class RollerCoaster extends Geometry {
       if( c == newIndex + 4 )
         c = newIndex;
       
-      faces.add( new Face4( a, b, c, d ) );
+      faces.add( new Face4( d, c, b, a ) );
       
       List faceVertexUV = faceVertexUvs[ 0 ];
       faceVertexUV.add( [
