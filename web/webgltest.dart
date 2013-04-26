@@ -43,7 +43,8 @@ class SpiderCoaster
     rider = new CoasterRider(this);
     
     button.onClick.listen(buttonClicked);
-    button.style.position = "absoulte";
+    button.style.position = "absolute";
+    button.value = "Editor";
     document.body.append(button);
   }
 
@@ -60,7 +61,7 @@ class SpiderCoaster
     init();
     window.requestAnimationFrame(animate);
     
-    activeState = editor;
+    activeState = rider;
     activeState.begin();
   }
 
