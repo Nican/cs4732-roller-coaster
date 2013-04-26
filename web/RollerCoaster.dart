@@ -8,7 +8,6 @@ class RollerCoaster extends Geometry {
   CoasterSpline curve;
   
   RollerCoaster( this.curve ) : super() {
-    this["dynamic"] = true;
     isDynamic = true;
     updateGeomtry();    
   }
