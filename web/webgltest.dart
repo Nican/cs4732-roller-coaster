@@ -11,6 +11,8 @@ part 'RollerCoaster.dart';
 part 'CoasterSpline.dart';
 part 'CoasterRider.dart';
 part 'CoasterEditor.dart';
+part 'SparkParticle.dart';
+part 'SparkParticleHandler.dart';
 
 abstract class GameState {
   void update(num delta);
