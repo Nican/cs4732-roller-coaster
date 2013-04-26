@@ -9,25 +9,40 @@ import 'package:three/extras/controls/firstpersoncontrols.dart';
 part 'CartController.dart';
 part 'RollerCoaster.dart';
 part 'CoasterSpline.dart';
+part 'CoasterRider.dart';
 part 'CoasterEditor.dart';
 
-class Canvas_Geometry_Cube
+abstract class GameState {
+  void update(num delta);
+  void begin();
+  void end();
+}
+
+class SpiderCoaster
 {
   PerspectiveCamera camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.01, 100000 );
-  FirstPersonControls controls;
-  Scene scene = new Scene();
-  WebGLRenderer renderer;
-
-  Mesh cube;
-  
+  MeshNormalMaterial normalMaterial = new MeshNormalMaterial( shading: SmoothShading );
+  WebGLRenderer renderer = new WebGLRenderer( clearColorHex: 0xffffff );
   CoasterSpline spline = new CoasterSpline();
-  CartController cc;
-  
-  var mouseX = 0, mouseY = 0;
+  Scene scene = new Scene();
 
-  Canvas_Geometry_Cube()
+  CoasterEditor editor;
+  CoasterRider rider; 
+  RollerCoaster coasterGeometry;
+  
+  GameState activeState;
+  
+  InputElement button;
+
+  SpiderCoaster()
   {
+    button = new InputElement(type: 'submit');
+    editor = new CoasterEditor(this);
+    rider = new CoasterRider(this);
     
+    button.onClick.listen(buttonClicked);
+    button.style.position = "absoulte";
+    document.body.append(button);
   }
 
   void run()
@@ -38,62 +53,52 @@ class Canvas_Geometry_Cube
     spline.addPoint(new Vector3(300,100,300));
     spline.addPoint(new Vector3(300,100,0));
     
-    
-    cc = new CartController(spline, .16, .001);
+    coasterGeometry = new RollerCoaster( spline );
     
     init();
     window.requestAnimationFrame(animate);
+    
+    activeState = editor;
+    activeState.begin();
   }
 
   void init()
   {
-    controls = new FirstPersonControls (this.camera, document.body);
-
     Element container = new Element.tag('div');
     document.body.nodes.add( container );
-    
-    document.onMouseMove.listen(onDocumentMouseMove);
 
     camera.position.y = 150;
     camera.position.z = 500;
     scene.add( camera );
 
-    // Cube
-
-    MeshNormalMaterial mat = new MeshNormalMaterial( shading: SmoothShading );
-    
-    cube = new Mesh( new CubeGeometry( 20, 20, 20, 1, 1, 1 ), mat );
-    scene.add( cube );
-    
-    var coaster = new Mesh( new RollerCoaster( spline ), mat  );
+    var coaster = new Mesh( coasterGeometry, normalMaterial  );
     scene.add(coaster);
     
-    spline.points.forEach((CoasterSplineItem point){
-      //Mesh sphere = new Mesh( new SphereGeometry(8), new MeshBasicMaterial( color: 0xff0000, overdraw: true )  );
-     // sphere.position = point.position;
-      //scene.add(sphere);
-    });
+    //Geometry geometry = new Geometry();
+    //geometry.vertices = spline.getPoints(500);
+    //var line = new Line(geometry, new LineBasicMaterial(color: 0xff0000));
+    //scene.add(line);
     
-    Geometry geometry = new Geometry();
-    geometry.vertices = spline.getPoints(500);
-    var line = new Line(geometry, new LineBasicMaterial(color: 0xff0000));
-    scene.add(line);
-    
-    Mesh floor = new Mesh( new PlaneGeometry(5000, 5000, 5, 5), new MeshNormalMaterial( shading: SmoothShading )  );
-    floor.position.y -= 50;
-    floor.rotation.x += -Math.PI / 2;
+    Mesh floor = new Mesh( new PlaneGeometry(5000, 5000, 5, 5), normalMaterial );
+    floor.position.y = -50;
+    floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
 
-    // Renderer
-    renderer = new WebGLRenderer( clearColorHex: 0xffffff );
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     container.nodes.add( renderer.domElement );
   }
   
-  onDocumentMouseMove(MouseEvent event) {
-    mouseX = ( event.clientX - window.innerWidth / 2 ) * 2;
-    mouseY = ( event.clientY - window.innerHeight / 2 ) * 2;
+  void buttonClicked(MouseEvent event){
+    if( activeState == editor ){
+      editor.end();
+      activeState = rider;
+      rider.begin();
+    } else {
+      rider.end();
+      activeState = editor;
+      editor.begin();
+    }
   }
 
   void animate(num highResTime)
@@ -107,20 +112,7 @@ class Canvas_Geometry_Cube
   {    
     num delta = Math.min(t-lastTime, 100.0);
     
-    cc.update(delta);
-    cube.position = cc.getCurPoint();
-    
-    Vector3 forward = spline.getForward(cc.cur_t);        
-    Quaternion quaternion = spline.getQuaternion(cc.cur_t);    
-    Quaternion quaternion2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
-    quaternion.multiplySelf( quaternion2 );
-    
-    cube.rotation.setEulerFromQuaternion(quaternion);
-    cube.position.addSelf( quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(18) );
-    
-    //camera.position = cube.position;
-    //camera.rotation = cube.rotation;
-    controls.update(delta / 4);
+    activeState.update(delta);    
     
     renderer.render( scene, camera );
     lastTime = t;
@@ -128,5 +120,5 @@ class Canvas_Geometry_Cube
 }
 
 void main() {
-  new Canvas_Geometry_Cube().run();
+  new SpiderCoaster().run();
 }

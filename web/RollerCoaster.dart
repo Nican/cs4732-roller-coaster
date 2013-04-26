@@ -8,13 +8,26 @@ class RollerCoaster extends Geometry {
   CoasterSpline curve;
   
   RollerCoaster( this.curve ) : super() {
+    this["dynamic"] = true;
+    isDynamic = true;
+    updateGeomtry();    
+  }
+  
+  void updateGeomtry()
+  {
+    faces.clear();
+    vertices.clear();
+    faceVertexUvs[ 0 ].clear();
+    
     createRail( Math.PI / 2 );
     createRail( Math.PI / -2 );
     
     computeCentroids();
     computeFaceNormals();
-    computeVertexNormals();
+    //computeVertexNormals();
     mergeVertices();
+    
+    this["verticesNeedUpdate"] = true;
   }
   
   void createRail( num offset ){
