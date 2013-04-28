@@ -2,10 +2,9 @@ part of RollerCoaster;
 
 class CoasterSplineItem {
   Vector3 position;
-  Vector3 up;
   num rotation;
   
-  CoasterSplineItem(this.position, this.up, this.rotation);
+  CoasterSplineItem(this.position, this.rotation);
   
   num get x            => position.x;
   num get y            => position.y;
@@ -21,11 +20,10 @@ class CoasterSpline extends Curve3D
   CoasterSpline() : super() {
   }
 
-  void addPoint( Vector3 point, {Vector3 normal: null, num rotation: 0} )
+  void addPoint( Vector3 point, {num rotation: 0} )
   {
     points.add(new CoasterSplineItem(
       point,
-      normal == null ? up : normal,
       rotation
     ));   
   }
@@ -59,24 +57,6 @@ class CoasterSpline extends Curve3D
         CRSpline(pt[0].y, pt[1].y, pt[2].y, pt[3].y, weight),
         CRSpline(pt[0].z, pt[1].z, pt[2].z, pt[3].z, weight)
     );
-  }
-  
-  Vector3 getUp( num t ) {
-    var point = points.length * t,
-        intPoint = point.floor().toInt(),
-        weight = point - intPoint,
-        pt = getItems( intPoint );
-
-    Vector3 up = new Vector3(
-        CurveUtils.interpolate(pt[0].up.x, pt[1].up.x, pt[2].up.x, pt[3].up.x, weight),
-        CurveUtils.interpolate(pt[0].up.y, pt[1].up.y, pt[2].up.y, pt[3].up.y, weight),
-        CurveUtils.interpolate(pt[0].up.z, pt[1].up.z, pt[2].up.z, pt[3].up.z, weight)
-    );
-    //Vector3 forward = getForward(t);
-    //Vector3 cross = up.crossSelf(forward);
-    //Vector3 result = cross.crossSelf(new Vector3(0,1,0)).normalize();
-    return up;
-    
   }
   
   /*
@@ -132,6 +112,17 @@ class CoasterSpline extends Curve3D
   
   Quaternion getQuaternion( num t, [num extraRotation = 0] ){
     return new Quaternion().setFromAxisAngle(getForward(t), getRotation(t) + extraRotation);
+  }
+  
+  Quaternion getQuaternion2( num t, {Vector3 direction, num extraRotation: 0} ){
+    Vector3 forward = getForward(t);
+    
+    Quaternion q = new Quaternion().setFromAxisAngle(forward, getRotation(t) + extraRotation);
+    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,1), forward );
+    
+    q.multiplySelf( q2 );
+    
+    return q;
   }
   
 }

@@ -35,11 +35,9 @@ class RollerCoaster extends Geometry {
     
     for(num t = 0; t <= 1.0; t += delta ){
       Vector3 position = curve.getPoint(t);
-      Quaternion quaternion = curve.getQuaternion(t, offset);
-      Quaternion quaternion2 = new Quaternion().rotationBetween(new Vector3(0,0,1), curve.getForward(t) );
-      quaternion.multiplySelf( quaternion2 );
+      Quaternion quaternion = curve.getQuaternion2(t, extraRotation: offset);
       
-      Vector3 ringOffset = quaternion.multiplyVector3(curve.getUp(t)).multiplyScalar(5);
+      Vector3 ringOffset = quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(5);
       
       int newRing = addRing( position.clone().addSelf(ringOffset), quaternion ); //.clone().addSelf(ringOffset)
       
