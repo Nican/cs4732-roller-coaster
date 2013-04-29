@@ -57,8 +57,8 @@ class CartController{
     Vector3 next = curve.getPoint(cur_t);
     
     //Force Calculations
-    Vector3 direction = (next.clone().subSelf(lastPoint)).normalize();
-    Vector3 acceleration = direction.clone().multiplyScalar(speed).subSelf(lastDirection.clone().multiplyScalar(lastSpeed)).divideScalar(t_delta);
+    Vector3 direction = (next.clone().subSelf(lastPoint)).normalize().multiplyScalar(forward?1:-1);
+    Vector3 acceleration = direction.clone().multiplyScalar(speed).subSelf(lastDirection.clone().multiplyScalar(lastSpeed)).divideScalar(t_delta).multiplyScalar(forward?1:-1);
     acceleration.y += g;
     
     Vector3 normal = getCurNormal();
@@ -69,9 +69,9 @@ class CartController{
     
     num forwardForce = direction.dot(acceleration)/g;
     
-    forces.x = forwardForce;
+    forces.x = lateralForce;
     forces.y = gForce;
-    forces.z = lateralForce;
+    forces.z = forwardForce;
     
     //set state
     curHeight = next.y;    
