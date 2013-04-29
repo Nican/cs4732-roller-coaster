@@ -84,7 +84,7 @@ class CoasterSpline extends Curve3D
         t * t * t * (  -p1 + 3*p2 - 3*p3 + p4 ) +
         t * t *     ( 2*p1 - 5*p2 + 4*p3 - p4 ) +
         t *         (  -p1        +   p3      ) + 
-                    (         2*p2            ));
+                    (        2*p2             ));
   }
   
   //The derivate of the CRSpline will give the velocity/direction
@@ -118,11 +118,11 @@ class CoasterSpline extends Curve3D
     Vector3 forward = getForward(t);
     
     Quaternion q = new Quaternion().setFromAxisAngle(forward, getRotation(t) + extraRotation);
-    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,1), forward );
+    forward.y = 0;
+    forward.normalize();
+    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
     
-    q.multiplySelf( q2 );
-    
-    return q;
+    return q.multiplySelf( q2 );
   }
   
 }

@@ -88,7 +88,7 @@ class RollerCoaster extends Geometry {
       if( c == newIndex + segmentsRadius )
         c = newIndex;
       
-      faces.add( new Face4( a, b, c, d ) );
+      faces.add( new Face4( d, c, b, a ) );
       
       List faceVertexUV = faceVertexUvs[ 0 ];
       faceVertexUV.add( [
