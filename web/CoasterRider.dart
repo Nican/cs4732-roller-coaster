@@ -63,7 +63,7 @@ class CoasterRider implements GameState  {
     psystem.active = cc.forces.x.abs()>2;
     psystem.position = cube.position.clone().addSelf(quaternion.multiplyVector3(new Vector3(cc.forces.x.isNegative?20:-10,-10,cc.forward?-10:10)));
     psystem.forward = quaternion.multiplyVector3(new Vector3(cc.forces.x.isNegative?1:-1,0,0));
-    psystem.velocity = forward.clone().multiplyScalar(cc.calcSpeed());
+    psystem.velocity = forward.clone().multiplyScalar(cc.calcSpeed()*.5*(cc.forward?1:-1));
     psystem.update();
   }
   void keyHandler(KeyboardEvent e){
