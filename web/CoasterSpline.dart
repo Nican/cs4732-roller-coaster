@@ -146,7 +146,7 @@ class CoasterSpline extends Curve3D
     Vector3 forward = getForward(t);
     
     Quaternion q = new Quaternion().setFromAxisAngle(forward, getRotation(t));
-    Quaternion q2 = getQuaternion3(t);  //new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
+    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), forward ); //getQuaternion3(t);
     
     return q.multiplySelf( q2 );
   }
