@@ -1,12 +1,19 @@
 part of RollerCoaster;
 
+class RiderCameraType {
+  static const FIRST = 0;
+  static const CHASE = 1;
+  static const FREE = 2;
+}
+
 class CoasterRider implements GameState  {
   
   SpiderCoaster coaster;
   CartController cc;
   Mesh cube;
   SparkParticleHandler psystem;
-  bool thirdPerson = false;
+  //bool thirdPerson = false;
+  int camera = RiderCameraType.FIRST;
   
   StreamSubscription<KeyboardEvent> keyDownEvent;
   FirstPersonControls controls;
@@ -29,7 +36,6 @@ class CoasterRider implements GameState  {
     psystem.add();
     psystem.active = true;
     keyDownEvent.resume();
-    thirdPerson = false;
   }
   
   void end()
@@ -51,7 +57,8 @@ class CoasterRider implements GameState  {
     
     cube.quaternion = quaternion;
     cube.position.addSelf( quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(18) );
-
+  
+    /*
     if(!thirdPerson){
       coaster.camera.position = cube.position;
       coaster.camera.quaternion = cube.quaternion;
@@ -59,6 +66,18 @@ class CoasterRider implements GameState  {
     else{
       controls.update(delta);
     }
+    */
+    if( camera == RiderCameraType.FREE ){
+      controls.update(delta);
+    } else {
+      coaster.camera.quaternion = cube.quaternion;
+      coaster.camera.position = cube.position.clone();
+      
+      if( camera == RiderCameraType.CHASE ){
+        coaster.camera.position.subSelf( cube.quaternion.multiplyVector3( new Vector3(0, -60, -100) ) );        
+      }
+    }
+    
 
     psystem.active = cc.forces.x.abs()>2;
     psystem.position = cube.position.clone().addSelf(quaternion.multiplyVector3(new Vector3(cc.forces.x.isNegative?20:-10,-10,cc.forward?-10:10)));
@@ -68,8 +87,11 @@ class CoasterRider implements GameState  {
   }
   void keyHandler(KeyboardEvent e){
     if(e.keyCode == KeyCode.T){
-      thirdPerson = !thirdPerson;
-      coaster.camera.useQuaternion = !coaster.camera.useQuaternion;
+      //thirdPerson = !thirdPerson;
+      //coaster.camera.useQuaternion = !coaster.camera.useQuaternion;
+      camera = (camera + 1) % 3;
+      
+      coaster.camera.useQuaternion = camera != RiderCameraType.FREE;
     }
   }
 }
