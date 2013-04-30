@@ -24,10 +24,13 @@ class SpiderCoaster
 {
   PerspectiveCamera camera = new PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.01, 100000 );
   MeshNormalMaterial normalMaterial = new MeshNormalMaterial( shading: SmoothShading );
+  Material phongMaterial = new MeshLambertMaterial( color: 0xff0000, emissive: 0x441111  );
   WebGLRenderer renderer = new WebGLRenderer( clearColorHex: 0xffffff );
   CoasterSpline spline = new CoasterSpline();
   Scene scene = new Scene();
+  Light light = new PointLight( 0xffffff );
 
+  
   CoasterEditor editor;
   CoasterRider rider; 
   RollerCoaster coasterGeometry;
@@ -46,6 +49,8 @@ class SpiderCoaster
     button.style.position = "absolute";
     button.value = "Editor";
     document.body.append(button);
+    light.position = new Vector3( 0, 1000000, 0 );
+    scene.add( light );
   }
 
   void run()
@@ -74,7 +79,7 @@ class SpiderCoaster
     camera.position.z = 500;
     scene.add( camera );
 
-    var coaster = new Mesh( coasterGeometry, normalMaterial  );
+    var coaster = new Mesh( coasterGeometry, phongMaterial  );
     scene.add(coaster);
     
     //Geometry geometry = new Geometry();

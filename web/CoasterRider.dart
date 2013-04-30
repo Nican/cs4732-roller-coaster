@@ -30,7 +30,7 @@ class CoasterRider implements GameState  {
   
   void begin()
   {
-    cc = new CartController(coaster.spline, .16, .001);
+    cc = new CartController(coaster.spline, .21, .001);
     coaster.scene.add( cube );
     coaster.camera.useQuaternion = true;
     camera = RiderCameraType.FIRST;
