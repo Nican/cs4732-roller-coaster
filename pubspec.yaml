@@ -3,4 +3,7 @@ description: A sample web application
 dependencies:
   browser: any
   three: 
-    path: C:/Users/nican/Documents/GitHub/three.dart
+     git:
+      url: git://github.com/Nican/three.dart.git
+      ref: latest
+
