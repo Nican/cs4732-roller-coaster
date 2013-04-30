@@ -6,6 +6,7 @@ class CoasterEditor implements GameState {
   StreamSubscription<MouseEvent> mouseDownEvent;
   StreamSubscription<MouseEvent> mouseUpEvent;
   StreamSubscription<MouseEvent> mouseMoveEvent;
+  StreamSubscription<KeyboardEvent> keyboardEvent;
   
   Projector projector = new Projector();
   List<SelectMesh> objects = new List();
@@ -16,23 +17,28 @@ class CoasterEditor implements GameState {
   Vector2 startPosition; 
   Vector3 splineStartPosition;
   Vector3 normal;
+  num originalRotation = 0;
   
   CoasterEditor(this.coaster)
   {
     controls = new FirstPersonControls (coaster.camera, document.body);
+    
     mouseDownEvent =  document.body.onMouseDown.listen(onDocumentMouseDown);
     mouseMoveEvent =  document.body.onMouseMove.listen(onDocumentMouseMove);
     mouseUpEvent =  document.body.onMouseUp.listen(onDocumentMouseUp);
+    keyboardEvent =  document.body.onKeyUp.listen(onDocumentKeyUp);
     
     mouseDownEvent.pause();
     mouseUpEvent.pause();
     mouseMoveEvent.pause();
+    keyboardEvent.pause();
   }
   
   void begin(){
     mouseDownEvent.resume();
     mouseUpEvent.resume();
     mouseMoveEvent.resume();
+    keyboardEvent.resume();
     
     coaster.spline.points.forEach(addSplineItem);
   }
@@ -41,6 +47,7 @@ class CoasterEditor implements GameState {
     mouseDownEvent.pause();
     mouseUpEvent.pause();
     mouseMoveEvent.pause();
+    keyboardEvent.pause();
     
     objects.forEach( coaster.scene.remove );
     objects.clear();
@@ -73,6 +80,7 @@ class CoasterEditor implements GameState {
       
       splineStartPosition = mesh.splinePoint.position.clone();
       normal = intersect.face.normal;
+      originalRotation = mesh.splinePoint.rotation;
 
       movingMesh = mesh;
     }
@@ -97,7 +105,38 @@ class CoasterEditor implements GameState {
     if( movingMesh == null )
       return;
     
-    movingMesh.position = splineStartPosition.clone().addSelf( new Vector3(event.page.x - startPosition.x, event.page.y - startPosition.y, 0) );
+    num deltaX = event.page.x - startPosition.x;
+    num deltaY = event.page.y - startPosition.y;
+    
+    movingMesh.position = splineStartPosition.clone().addSelf( normal.clone().multiplyScalar(deltaX) );
+    movingMesh.splinePoint.position = movingMesh.position.clone();
+    movingMesh.splinePoint.rotation = originalRotation + deltaY / 20;
+    
+    coaster.spline.updateArcLengths();
+    coaster.coasterGeometry.updateGeomtry();
+    
+  }
+  
+  void onDocumentKeyUp( KeyboardEvent event )
+  {
+    if( movingMesh == null )
+      return;
+    
+    switch(event.keyCode)
+    {
+      case 68: //D
+        int index = coaster.spline.points.indexOf(movingMesh.splinePoint);
+        assert(index != -1 );
+        CoasterSplineItem old = movingMesh.splinePoint;
+        CoasterSplineItem point = new CoasterSplineItem(old.position.clone(), old.rotation);
+        
+        coaster.spline.points.insert(index, point);
+        
+        addSplineItem( point );       
+        
+        break;
+    }
+    
   }
   
   void update(num delta)

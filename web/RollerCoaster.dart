@@ -18,8 +18,8 @@ class RollerCoaster extends Geometry {
     vertices.clear();
     faceVertexUvs[ 0 ].clear();
     
-    createRail( Math.PI / 2 );
-    createRail( Math.PI / -2 );
+    createRail( new Vector3(1,0,0) );
+    createRail( new Vector3(-1,0,0) );
     
     computeCentroids();
     computeFaceNormals();
@@ -29,15 +29,15 @@ class RollerCoaster extends Geometry {
     this["verticesNeedUpdate"] = true;
   }
   
-  void createRail( num offset ){
+  void createRail( Vector3 offset ){
     int firstRing = null;
     int lastRing = null;
     
     for(num t = 0; t <= 1.0; t += delta ){
       Vector3 position = curve.getPoint(t);
-      Quaternion quaternion = curve.getQuaternion2(t, extraRotation: offset);
+      Quaternion quaternion = curve.getQuaternion2(t);
       
-      Vector3 ringOffset = quaternion.multiplyVector3(new Vector3(0,1,0)).multiplyScalar(5);
+      Vector3 ringOffset = quaternion.multiplyVector3( offset.clone() ).multiplyScalar(5);
       
       int newRing = addRing( position.clone().addSelf(ringOffset), quaternion ); //.clone().addSelf(ringOffset)
       

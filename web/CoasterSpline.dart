@@ -114,13 +114,39 @@ class CoasterSpline extends Curve3D
     return new Quaternion().setFromAxisAngle(getForward(t), getRotation(t) + extraRotation);
   }
   
-  Quaternion getQuaternion2( num t, {Vector3 direction, num extraRotation: 0} ){
+  Quaternion getQuaternion3( num t ){
+    var point = points.length * t,
+        intPoint = point.floor().toInt(),
+        weight = point - intPoint,
+        pt = getItems( intPoint );
+    
+    
+    Vector3 v1 = new Vector3(
+        CRSplineDirection(pt[0].x, pt[1].x, pt[2].x, pt[3].x, 0),
+        CRSplineDirection(pt[0].y, pt[1].y, pt[2].y, pt[3].y, 0),
+        CRSplineDirection(pt[0].z, pt[1].z, pt[2].z, pt[3].z, 0)
+    ).normalize();
+    
+    Vector3 v2 = new Vector3(
+        CRSplineDirection(pt[0].x, pt[1].x, pt[2].x, pt[3].x, 1),
+        CRSplineDirection(pt[0].y, pt[1].y, pt[2].y, pt[3].y, 1),
+        CRSplineDirection(pt[0].z, pt[1].z, pt[2].z, pt[3].z, 1)
+    ).normalize();
+    
+    Quaternion q1 = new Quaternion().rotationBetween(new Vector3(0,0,-1), v1 );
+    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), v2 );
+    Quaternion ret = new Quaternion();
+    
+    Quaternion.slerp(q1, q2, ret, weight);
+    
+    return ret;    
+  }
+  
+  Quaternion getQuaternion2( num t ){
     Vector3 forward = getForward(t);
     
-    Quaternion q = new Quaternion().setFromAxisAngle(forward, getRotation(t) + extraRotation);
-    forward.y = 0;
-    forward.normalize();
-    Quaternion q2 = new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
+    Quaternion q = new Quaternion().setFromAxisAngle(forward, getRotation(t));
+    Quaternion q2 = getQuaternion3(t);  //new Quaternion().rotationBetween(new Vector3(0,0,-1), forward );
     
     return q.multiplySelf( q2 );
   }
