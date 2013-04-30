@@ -37,7 +37,7 @@ class SparkParticleHandler {
     particles[curIndex].position = position.clone();
     particles[curIndex].velocity.x = (forward.x + random.nextDouble()/4-.125) * (random.nextDouble()/4+.875)*speed + velocity.x;
     particles[curIndex].velocity.y = (forward.y + random.nextDouble()/4-.125) * (random.nextDouble()/4+.875)*speed + velocity.y;
-    particles[curIndex].velocity.z = (forward.z + random.nextDouble()/3+.5) * (random.nextDouble()/4+.875)*speed + velocity.z;
+    particles[curIndex].velocity.z = (forward.z + random.nextDouble()/4-.125) * (random.nextDouble()/4+.875)*speed + velocity.z;
     particles[curIndex].visible = true;
     particles[curIndex].ttl = (defaultTTL*(((random.nextDouble()-.5)/4+1))).ceil();
   }
