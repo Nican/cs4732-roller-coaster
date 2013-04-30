@@ -124,7 +124,13 @@ class CoasterEditor implements GameState {
     
     switch(event.keyCode)
     {
-      case 68: //D
+      case 46: //Delete button
+        coaster.spline.points.remove(movingMesh.splinePoint);
+        coaster.scene.remove( movingMesh );
+        objects.remove(movingMesh);
+        break;
+      
+      case 68: //D, for duplicate
         int index = coaster.spline.points.indexOf(movingMesh.splinePoint);
         assert(index != -1 );
         CoasterSplineItem old = movingMesh.splinePoint;
