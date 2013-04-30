@@ -87,7 +87,7 @@ class SpiderCoaster
     //var line = new Line(geometry, new LineBasicMaterial(color: 0xff0000));
     //scene.add(line);
     
-    Mesh floor = new Mesh( new PlaneGeometry(5000, 5000, 5, 5), normalMaterial );
+    Mesh floor = new Mesh( new PlaneGeometry(5000, 5000, 5, 5), new MeshLambertMaterial( color: 0x00dd00, ambient: 0x00dd00 ) );
     floor.position.y = -50;
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
