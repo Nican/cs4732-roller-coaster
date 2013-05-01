@@ -3,6 +3,13 @@ CS4732 Spider Coaster!
 
 Simpler roller coaster, programmed in Dart, using three.dart, and rendering for WebGL.
 
+Live demo: http://users.wpi.edu/~nican/coaster/
+
+Building:
+* Download the Dart editor at: http://www.dartlang.org/tools/
+* Download, and import, the source for this project.
+* Run! :D
+
 Commands:
 * In the rider
 	* T = Toggles between First person/Chase Camera/Free Camera (WASDQE and mouse look, right mouse forward, left mouse backward)
