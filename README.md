@@ -4,6 +4,7 @@ CS4732 Spider Coaster!
 Simpler roller coaster, programmed in Dart, using three.dart, and rendering for WebGL.
 
 Live demo: http://users.wpi.edu/~nican/coaster/
+Project source: https://github.com/Nican/cs4732-roller-coaster
 
 Building:
 * Download the Dart editor at: http://www.dartlang.org/tools/
